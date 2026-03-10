@@ -1,5 +1,9 @@
 # 🦬 Bruno the Storytelling Bison
 ### Morning Star Elementary — Voice AI Demo
+<img width="960" height="808" alt="Screenshot 2026-03-10 at 12 02 15 AM" src="https://github.com/user-attachments/assets/67d917e3-72af-4a31-916c-ae33eda33c3e" />
+
+<img width="800" height="802" alt="Screenshot 2026-03-10 at 12 30 24 AM" src="https://github.com/user-attachments/assets/d8746e29-0bf4-426d-bb8c-5c5f806b1a30" />
+
 
 Kids give Bruno the Bison 4 story ingredients by speaking or typing. He thinks for a few seconds, then tells a short funny story (~45 seconds) read aloud in the browser. Run multiple rounds and watch the stories change every time.
 
