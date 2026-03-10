@@ -1,105 +1,139 @@
 # 🦬 Bruno the Storytelling Bison
 ### Morning Star Elementary — Voice AI Demo
 
-A fully local, kid-friendly voice AI demo where children give Bruno the Bison story ingredients and he creates a short 1-minute story, read aloud in the browser.
+Kids give Bruno the Bison 4 story ingredients by speaking or typing. He thinks for a few seconds, then tells a short funny story (~45 seconds) read aloud in the browser. Run multiple rounds and watch the stories change every time.
 
-**No internet required after setup. No paid software. No API keys.**
+**Fully local. No internet required after setup. No API keys. No paid software.**
 
 ---
 
-## What It Does
+## How It Works
 
-1. Kids speak or type 3–4 story ingredients (a character, a place, a problem, something magical)
-2. Bruno "thinks" with a bouncing animation
-3. A short ~150-word story appears, tailored to their ingredients
-4. Teacher presses **▶️ Play Story Aloud** when the class is ready
-5. The browser reads the story in a natural voice
+```
+Browser (index.html)
+    │
+    ├─ Voice input → MediaRecorder → POST /api/transcribe
+    └─ Story request → POST /api/story
+                              ▼
+              Python server (server.py) :5001
+                    │
+                    ├─ /api/transcribe → whisper-cli (local speech-to-text)
+                    └─ /api/story      → Ollama (local LLM)
+                                                │
+                                        Browser reads story aloud
+                                        via built-in macOS TTS
+```
 
 ---
 
 ## Requirements
 
-- macOS (M-series Mac recommended, M4 Pro is perfect)
-- [Ollama](https://ollama.com) — already installed ✅
-- Python 3 (comes with macOS)
-- A modern browser (Chrome works best for voice input)
+- **macOS** with Apple Silicon (M1/M2/M3/M4 recommended)
+- **Python 3** — comes pre-installed on macOS
+- **Homebrew** — macOS package manager
+- **Google Chrome** — for microphone and TTS support
 
 ---
 
-## Setup (One Time)
+## One-Time Setup
 
-### 1. Make sure Ollama has the model
-
+### 1. Install Homebrew (if not already installed)
 ```bash
-# You already have these — pick one:
-ollama pull llama3.2      # recommended (faster, great for short stories)
-# or
-ollama pull llama3.1
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-If you want to change the model, edit line 16 of `server.py`:
-```python
-OLLAMA_MODEL = "llama3.2"   # change to "llama3.1" if preferred
+### 2. Install Ollama
+```bash
+brew install ollama
 ```
+Or download the Mac app directly from [ollama.com](https://ollama.com).
 
-### 2. (Optional) Install Whisper for microphone fallback
+### 3. Pull a language model
+```bash
+ollama pull llama3.2
+```
+`llama3.2` (3B parameters) is fast and works great for short funny stories on Apple Silicon. You can also use `llama3.1` (8B) for slightly more creative output at the cost of a few extra seconds per story.
 
-The app uses Chrome's built-in speech recognition by default — no install needed.
-
-If you ever want the more accurate Whisper backend:
+### 4. Install whisper-cli and ffmpeg (for offline voice input)
 ```bash
 brew install whisper-cpp ffmpeg
+```
+Note: Homebrew installs the speech-to-text binary as `whisper-cli`.
+
+### 5. Download the Whisper speech model (~140MB, one-time)
+```bash
 mkdir -p ~/.whisper
-# Download the small English model (~150MB):
 curl -L https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin \
      -o ~/.whisper/ggml-base.en.bin
+```
+
+### 6. Clone this repo
+```bash
+git clone https://github.com/kristianhansen/bison-storyteller.git
+cd bison-storyteller
 ```
 
 ---
 
 ## Running the Demo
 
-### Step 1 — Start Ollama
+### Terminal 1 — Start Ollama
 ```bash
 ollama serve
 ```
-(Leave this terminal open, or it may already be running in the background)
+If you see `address already in use`, Ollama is already running in the background — skip this step.
 
-### Step 2 — Start Bruno's server
-Open a new terminal window, navigate to this folder, then:
-
+### Terminal 2 — Start the server
 ```bash
-cd /path/to/bison-storyteller
+cd bison-storyteller
 python3 server.py
 ```
 
-You'll see:
+You should see:
 ```
 🦬  Bruno the Storytelling Bison — Backend Server
 ==================================================
    Model  : llama3.2
    Ollama : http://localhost:11434/api/chat
-   Port   : 5000
+   Port   : 5001
 ==================================================
 
-🌐 Open your browser: http://localhost:5000
+🌐 Open your browser: http://localhost:5001
 ```
 
-### Step 3 — Open the app
-Go to **http://localhost:5000** in Chrome.
-
-That's it! The app is fully self-contained.
+### Open Chrome and go to:
+```
+http://localhost:5001
+```
 
 ---
 
-## Demo Script (for the classroom)
+## Demo Flow (for the classroom)
 
-1. **Introduce Bruno** — "This is Bruno, Morning Star's storytelling bison. He needs YOUR help!"
-2. **Collect ingredients** — Call on 3-4 kids to give an ingredient each. They can click 🎤 to speak, or a helper can type.
-3. **Hit the button** — "Bruno, Tell Us a Story!"
-4. **Watch Bruno think** — He bounces around while the AI generates (usually 5-10 seconds)
-5. **Press Play** — When the class settles, press the navy ▶️ Play Story Aloud button
-6. **Listen** — The browser reads the story aloud
+1. **Introduce Bruno** — "This is Bruno, Morning Star's storytelling bison. He needs YOUR help to make a story!"
+2. **Step through 4 ingredients** — call on different kids for each one:
+   - 🦸 A main character
+   - 🌍 A place
+   - ⚡ A problem or challenge
+   - ✨ Something magical (optional)
+3. **Speak or type** — hit the red **Speak Answer** button, the kid says their answer, it transcribes in the big display box
+4. **Watch Bruno think** — he bounces around while the story generates (5–10 seconds)
+5. **Settle the class, then press Play** — the navy ▶️ button reads the story aloud
+6. **Run it again** — refresh the page (`Cmd+R`) for a fresh round with new ingredients
+
+---
+
+## Configuration
+
+All settings are at the top of `server.py`:
+
+| Setting | Default | Description |
+|---|---|---|
+| `OLLAMA_MODEL` | `llama3.2` | Swap to any model you've pulled with `ollama pull` |
+| `PORT` | `5001` | Change if the port is already in use |
+| `SYSTEM_PROMPT` | (see file) | Controls story tone, length, and style |
+
+To change story length or tone, edit `SYSTEM_PROMPT` in `server.py`. For example, you could make Bruno tell science facts, rhyming poems, or spooky Halloween stories.
 
 ---
 
@@ -107,40 +141,23 @@ That's it! The app is fully self-contained.
 
 | Problem | Fix |
 |---|---|
-| "Cannot reach Ollama" | Run `ollama serve` in a terminal |
-| Voice input not working | Use Chrome; Safari doesn't support Web Speech API well |
-| Story takes too long | Switch model to `llama3.2` (faster than 3.1 for short outputs) |
-| No audio on Play | Check system volume; click elsewhere on page first (browser autoplay policy) |
+| `Cannot reach Ollama` | Run `ollama serve` in a terminal |
+| `Address already in use` on port 5001 | Change `PORT` in `server.py` to `5002` |
+| Mic button not working | Allow microphone access in Chrome (click the lock icon in the address bar) |
+| `whisper-cli not found` | Run `brew install whisper-cpp` — binary installs as `whisper-cli` |
+| Whisper model not found | Run the `mkdir` + `curl` commands in Step 5 above |
+| Story generates slowly | Make sure you're using `llama3.2` not a larger model |
+| No audio on Play | Click anywhere on the page first, then press Play (browser autoplay policy) |
 
 ---
 
-## Customization
-
-**Change the story style** — Edit the `SYSTEM_PROMPT` in `server.py`. You can make Bruno tell science facts, math adventures, history stories, etc.
-
-**Change the model** — Edit `OLLAMA_MODEL` in `server.py`.
-
-**School colors** — Currently set to navy (`#1a2e5a`) and gold (`#f5a800`). Edit the CSS variables at the top of `index.html` to match your exact brand colors.
-
-**Add more ingredient fields** — Copy any `.ingredient-card` block in `index.html` and add a new `input5` field, then include it in the `generateStory()` JS function.
-
----
-
-## Architecture
+## Project Structure
 
 ```
-Browser (index.html)
-    │
-    │  POST /api/story  { ingredients: "..." }
-    ▼
-Python server (server.py) — http://localhost:5000
-    │
-    │  POST http://localhost:11434/api/chat
-    ▼
-Ollama (llama3.2) — fully local LLM
-    │
-    └─ Returns story text → browser TTS reads it aloud
+bison-storyteller/
+├── index.html    # Frontend — step-by-step ingredient UI, voice recording, TTS playback
+├── server.py     # Backend — Python HTTP server, Ollama + Whisper integration
+└── README.md     # This file
 ```
 
-Voice input uses the browser's built-in Web Speech API (Chrome).
-A Whisper fallback endpoint (`/api/transcribe`) is included for future use.
+No pip installs required. Uses only Python's standard library plus Ollama, whisper-cli, and ffmpeg.
