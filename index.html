@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bruno the Storytelling Bison</title>
+  <style>
+    :root {
+      --navy: #1a2e5a;
+      --gold: #f5a800;
+      --gold-light: #ffd966;
+      --cream: #fff8ee;
+      --brown: #6b3a1f;
+      --green: #2d6a4f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--navy);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Stars background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 25%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 70%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 45% 55%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,0.6) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      color: white;
+    }
+
+    .school-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .header h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    }
+
+    .header h1 span {
+      color: var(--gold);
+    }
+
+    /* Bison character */
+    .bison-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bison-svg-wrapper {
+      width: 160px;
+      height: 160px;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+      transition: transform 0.3s ease;
+    }
+
+    .bison-svg-wrapper.thinking {
+      animation: bisonBounce 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes bisonBounce {
+      from { transform: translateY(0) rotate(-2deg); }
+      to   { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .speech-bubble {
+      background: white;
+      border-radius: 20px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      position: relative;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-bottom-color: white;
+    }
+
+    /* ── Pipeline Step UI ───────────────────────────────────────────── */
+
+    .pipeline-section {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      padding: 28px 24px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Progress dots */
+    .step-dots {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.3s, transform 0.3s;
+      position: relative;
+    }
+
+    .step-dot.done {
+      background: var(--green);
+    }
+
+    .step-dot.active {
+      background: var(--gold);
+      transform: scale(1.35);
+      box-shadow: 0 0 0 4px rgba(245,168,0,0.25);
+    }
+
+    .step-dot-label {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .step-dot.active .step-dot-label { color: var(--gold); }
+    .step-dot.done  .step-dot-label  { color: rgba(255,255,255,0.6); }
+
+    /* Step connector lines */
+    .step-connector {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.15);
+      max-width: 60px;
+      border-radius: 2px;
+      transition: background 0.4s;
+    }
+
+    .step-connector.done { background: var(--green); }
+
+    /* Question prompt */
+    .step-question {
+      text-align: center;
+      color: var(--gold-light);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Big transcript display */
+    .transcript-display {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      padding: 20px 24px;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.3px;
+      line-height: 1.3;
+      transition: border-color 0.3s, background 0.3s;
+      word-break: break-word;
+    }
+
+    .transcript-display.listening {
+      border-color: #e74c3c;
+      background: rgba(231,76,60,0.12);
+      animation: listenPulse 1.5s ease-in-out infinite;
+    }
+
+    .transcript-display.has-value {
+      border-color: var(--gold);
+      background: rgba(245,168,0,0.1);
+    }
+
+    @keyframes listenPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.3); }
+      50%       { box-shadow: 0 0 0 10px rgba(231,76,60,0); }
+    }
+
+    .transcript-placeholder {
+      color: rgba(255,255,255,0.3);
+      font-style: italic;
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 500;
+    }
+
+    /* Hidden text input (kept for keyboard fallback) */
+    .text-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .ingredient-input {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 11px 14px;
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      outline: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .ingredient-input::placeholder {
+      color: rgba(255,255,255,0.3);
+      font-style: italic;
+    }
+
+    .ingredient-input:focus {
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    /* Step action buttons row */
+    .step-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .mic-btn {
+      padding: 14px 28px;
+      border-radius: 50px;
+      border: none;
+      background: #e74c3c;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(231,76,60,0.35);
+    }
+
+    .mic-btn:hover { background: #c0392b; transform: translateY(-1px); }
+    .mic-btn:active { transform: scale(0.96); }
+    .mic-btn.recording {
+      background: #c0392b;
+      animation: pulse 1s infinite;
+    }
+
+    .next-btn {
+      padding: 14px 28px;
+      border-radius: 50px;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .next-btn.enabled {
+      background: var(--gold);
+      color: var(--navy);
+      opacity: 1;
+      pointer-events: auto;
+      box-shadow: 0 4px 14px rgba(245,168,0,0.35);
+    }
+
+    .next-btn.enabled:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245,168,0,0.45); }
+    .next-btn.enabled:active { transform: scale(0.96); }
+
+    /* Collected ingredients summary */
+    .collected-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      min-height: 32px;
+    }
+
+    .collected-pill {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .collected-pill .pill-label {
+      color: var(--gold-light);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mic-btn-small {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .mic-btn-small:hover { background: rgba(255,255,255,0.25); }
+    .mic-btn-small:active { transform: scale(0.92); }
+    .mic-btn-small.recording { background: #e74c3c; animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(231,76,60,0.6); }
+      50%       { box-shadow: 0 0 0 8px rgba(231,76,60,0); }
+    }
+
+    /* Generate button */
+    .generate-btn {
+      width: 100%;
+      padding: 18px 32px;
+      background: linear-gradient(135deg, var(--gold), #e09000);
+      border: none;
+      border-radius: 16px;
+      color: var(--navy);
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 6px 24px rgba(245,168,0,0.35);
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+    }
+
+    .generate-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(245,168,0,0.45);
+    }
+
+    .generate-btn:active:not(:disabled) { transform: translateY(0); }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Story section */
+    .story-section {
+      width: 100%;
+      background: var(--cream);
+      border-radius: 20px;
+      padding: 28px;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+
+    .story-section.visible { display: flex; }
+
+    .story-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .story-header h3 {
+      color: var(--navy);
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .story-ready-badge {
+      background: var(--green);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+    .story-text {
+      color: #2c2c2c;
+      font-size: 17px;
+      line-height: 1.75;
+      font-family: Georgia, serif;
+    }
+
+    .play-btn {
+      align-self: center;
+      padding: 16px 40px;
+      background: linear-gradient(135deg, var(--navy), #2a4080);
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(26,46,90,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .play-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,46,90,0.4); }
+    .play-btn:active { transform: translateY(0); }
+    .play-btn.playing { background: linear-gradient(135deg, #c0392b, #962d22); }
+
+    .play-icon { font-size: 22px; }
+
+    /* Voice picker */
+    .voice-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .voice-picker-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .voice-select {
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      max-width: 260px;
+    }
+
+    .voice-select:focus { border-color: var(--navy); }
+
+    /* Loading dots */
+    .loading-dots {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .loading-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: dotBounce 1.2s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40%            { transform: scale(1); opacity: 1; }
+    }
+
+    /* Status bar */
+    .status-bar {
+      width: 100%;
+      text-align: center;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px;
+      min-height: 20px;
+    }
+
+    .status-bar.error { color: #e74c3c; }
+
+    /* Footer */
+    .footer {
+      color: rgba(255,255,255,0.3);
+      font-size: 12px;
+      text-align: center;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="school-name">⭐ Morning Star Elementary ⭐</div>
+      <h1>Bruno the <span>Storytelling Bison</span></h1>
+    </div>
+
+    <!-- Bison Character -->
+    <div class="bison-container">
+      <div class="bison-svg-wrapper" id="bisonWrapper">
+        <!-- Bison SVG illustration -->
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Body -->
+          <ellipse cx="105" cy="130" rx="62" ry="48" fill="#5c3317"/>
+          <!-- Head (bigger, forward) -->
+          <ellipse cx="68" cy="105" rx="45" ry="40" fill="#6b3a1f"/>
+          <!-- Hump -->
+          <ellipse cx="95" cy="95" rx="35" ry="28" fill="#7a4422"/>
+          <!-- Forehead fur bump -->
+          <ellipse cx="58" cy="82" rx="28" ry="18" fill="#4a2510"/>
+          <!-- Ears -->
+          <ellipse cx="95" cy="78" rx="10" ry="14" fill="#5c3317" transform="rotate(-15,95,78)"/>
+          <ellipse cx="40" cy="82" rx="10" ry="14" fill="#5c3317" transform="rotate(20,40,82)"/>
+          <ellipse cx="95" cy="78" rx="5" ry="8" fill="#c47a5a" transform="rotate(-15,95,78)"/>
+          <ellipse cx="40" cy="82" rx="5" ry="8" fill="#c47a5a" transform="rotate(20,40,82)"/>
+          <!-- Eyes -->
+          <circle cx="52" cy="100" r="8" fill="white"/>
+          <circle cx="78" cy="97" r="7" fill="white"/>
+          <circle cx="54" cy="101" r="5" fill="#1a1a1a"/>
+          <circle cx="80" cy="98" r="4.5" fill="#1a1a1a"/>
+          <!-- Eye shine -->
+          <circle cx="56" cy="99" r="2" fill="white"/>
+          <circle cx="82" cy="96" r="1.8" fill="white"/>
+          <!-- Nose/snout -->
+          <ellipse cx="52" cy="122" rx="22" ry="16" fill="#4a2510"/>
+          <!-- Nostrils -->
+          <ellipse cx="44" cy="125" rx="5" ry="4" fill="#2a1008"/>
+          <ellipse cx="60" cy="125" rx="5" ry="4" fill="#2a1008"/>
+          <!-- Mouth / smile -->
+          <path d="M 40 132 Q 52 140 64 132" stroke="#2a1008" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <!-- Beard/chin fur -->
+          <ellipse cx="52" cy="140" rx="15" ry="10" fill="#3a1a08"/>
+          <!-- Horns -->
+          <path d="M 88 72 Q 100 50 112 58" stroke="#1a0e05" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <path d="M 38 76 Q 22 55 28 42" stroke="#1a0e05" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <!-- Horn tips -->
+          <circle cx="112" cy="58" r="4" fill="#1a0e05"/>
+          <circle cx="28" cy="42" r="4" fill="#1a0e05"/>
+          <!-- Legs -->
+          <rect x="72" y="170" width="18" height="28" rx="7" fill="#4a2510"/>
+          <rect x="98" y="172" width="18" height="26" rx="7" fill="#4a2510"/>
+          <rect x="122" y="170" width="18" height="28" rx="7" fill="#4a2510"/>
+          <rect x="148" y="168" width="16" height="26" rx="7" fill="#4a2510"/>
+          <!-- Hooves -->
+          <rect x="71" y="195" width="20" height="8" rx="4" fill="#1a0e05"/>
+          <rect x="97" y="195" width="20" height="8" rx="4" fill="#1a0e05"/>
+          <rect x="121" y="195" width="20" height="8" rx="4" fill="#1a0e05"/>
+          <rect x="147" y="191" width="18" height="8" rx="4" fill="#1a0e05"/>
+          <!-- Tail -->
+          <path d="M 167 120 Q 185 110 182 130 Q 186 145 175 150" stroke="#3a1a08" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <!-- Tail tuft -->
+          <ellipse cx="174" cy="153" rx="7" ry="10" fill="#1a0e05"/>
+          <!-- Gold star on side (school mascot touch) -->
+          <text x="118" y="148" font-size="20" fill="#f5a800" text-anchor="middle">⭐</text>
+        </svg>
+      </div>
+
+      <!-- Speech bubble -->
+      <div class="speech-bubble" id="speechBubble">
+        Hey there! Give me some story ingredients! 🌟
+      </div>
+    </div>
+
+    <!-- Pipeline Ingredient Section -->
+    <div class="pipeline-section" id="pipelineSection">
+
+      <!-- Progress dots -->
+      <div class="step-dots" id="stepDots">
+        <div class="step-dot active" id="dot0">
+          <span class="step-dot-label">Character</span>
+        </div>
+        <div class="step-connector" id="conn0"></div>
+        <div class="step-dot" id="dot1">
+          <span class="step-dot-label">Place</span>
+        </div>
+        <div class="step-connector" id="conn1"></div>
+        <div class="step-dot" id="dot2">
+          <span class="step-dot-label">Problem</span>
+        </div>
+        <div class="step-connector" id="conn2"></div>
+        <div class="step-dot" id="dot3">
+          <span class="step-dot-label">Magic</span>
+        </div>
+      </div>
+
+      <!-- Collected pills summary -->
+      <div class="collected-pills" id="collectedPills"></div>
+
+      <!-- Current step question -->
+      <div class="step-question" id="stepQuestion">🦸 Who is our main character?</div>
+
+      <!-- Big transcript display -->
+      <div class="transcript-display" id="transcriptDisplay">
+        <span class="transcript-placeholder" id="transcriptPlaceholder">e.g. a brave astronaut</span>
+      </div>
+
+      <!-- Text input fallback -->
+      <div class="text-input-row">
+        <input class="ingredient-input" id="textInput" type="text" placeholder="Or type it here..." />
+        <button class="mic-btn-small" id="textMicBtn" onclick="startVoiceStep(this)" title="Speak">🎤</button>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="step-actions">
+        <button class="mic-btn" id="micBtn" onclick="startVoiceStep(this)">
+          🎤 <span id="micBtnText">Speak Answer</span>
+        </button>
+        <button class="next-btn" id="nextBtn" onclick="nextStep()">
+          <span id="nextBtnLabel">Next →</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Status -->
+    <div class="status-bar" id="statusBar"></div>
+
+    <!-- Generate Button (shown only after all steps done) -->
+    <button class="generate-btn" id="generateBtn" onclick="generateStory()" style="display:none;">
+      🦬 Bruno, Tell Us a Story!
+    </button>
+
+    <!-- Story Output -->
+    <div class="story-section" id="storySection">
+      <div class="story-header">
+        <h3>📖 Bruno's Story</h3>
+        <div class="story-ready-badge" id="readyBadge">✅ Ready to Play!</div>
+      </div>
+      <div class="story-text" id="storyText"></div>
+      <div class="voice-picker-row">
+        <span class="voice-picker-label">🔊 Voice</span>
+        <select class="voice-select" id="voiceSelect"></select>
+      </div>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">
+        <span class="play-icon">▶️</span>
+        <span id="playBtnText">Play Story Aloud</span>
+      </button>
+    </div>
+
+    <div class="footer">Powered by Ollama + Whisper · Morning Star Elementary Voice AI Demo</div>
+
+  </div>
+
+  <script>
+    // ─── Step Definitions ─────────────────────────────────────────────
+    const STEPS = [
+      { label: '🦸 Who is our main character?', placeholder: 'e.g. a brave astronaut', pill: '🦸', pillLabel: 'Character' },
+      { label: '🌍 Where does the story happen?', placeholder: 'e.g. inside a volcano', pill: '🌍', pillLabel: 'Place' },
+      { label: '⚡ What problem do they face?', placeholder: 'e.g. a missing treasure map', pill: '⚡', pillLabel: 'Problem' },
+      { label: '✨ Add something magical! (optional)', placeholder: 'e.g. a flying skateboard', pill: '✨', pillLabel: 'Magic' },
+    ];
+
+    // ─── State ────────────────────────────────────────────────────────
+    let currentStep = 0;
+    const answers = ['', '', '', ''];
+    let activeRecognition = null;
+    let isPlaying = false;
+    let storyReady = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+
+    // ─── Init ─────────────────────────────────────────────────────────
+    renderStep(0);
+
+    // Watch text input for changes to enable Next button
+    document.getElementById('textInput').addEventListener('input', function() {
+      const val = this.value.trim();
+      updateTranscriptDisplay(val);
+      enableNext(val.length > 0 || currentStep === 3);
+    });
+
+    // ─── Step Rendering ───────────────────────────────────────────────
+    function renderStep(idx) {
+      const step = STEPS[idx];
+
+      // Update question & placeholder
+      document.getElementById('stepQuestion').textContent = step.label;
+      document.getElementById('textInput').placeholder = 'Or type it here...';
+      document.getElementById('textInput').value = answers[idx] || '';
+
+      // Update transcript display
+      const val = answers[idx] || '';
+      updateTranscriptDisplay(val);
+
+      // Update progress dots
+      STEPS.forEach((_, i) => {
+        const dot = document.getElementById(`dot${i}`);
+        dot.classList.remove('active', 'done');
+        if (i < idx) dot.classList.add('done');
+        else if (i === idx) dot.classList.add('active');
+
+        if (i < 3) {
+          const conn = document.getElementById(`conn${i}`);
+          conn.classList.toggle('done', i < idx);
+        }
+      });
+
+      // Next button label
+      const isLast = idx === STEPS.length - 1;
+      document.getElementById('nextBtnLabel').textContent = isLast ? 'Make Story! 🦬' : 'Next →';
+
+      // Enable next if optional step or already has answer
+      const hasAnswer = val.length > 0;
+      enableNext(hasAnswer || isLast);
+
+      // Reset mic button
+      stopRecording();
+
+      // Speech bubble
+      const bubbles = [
+        `Bruno needs ingredient ${idx + 1} of 4! 🎙️`,
+        `What's ${step.pillLabel.toLowerCase()}? Speak or type! 🎤`,
+        `Kid in the front, what do you think? 👀`,
+        `Almost done — last one! ✨`
+      ];
+      document.getElementById('speechBubble').textContent = bubbles[Math.min(idx, 3)];
+
+      // Update collected pills
+      renderPills();
+    }
+
+    function updateTranscriptDisplay(val) {
+      const display = document.getElementById('transcriptDisplay');
+      const placeholder = document.getElementById('transcriptPlaceholder');
+      if (val) {
+        display.innerHTML = '';
+        display.appendChild(document.createTextNode(val));
+        display.classList.add('has-value');
+        display.classList.remove('listening');
+      } else {
+        display.innerHTML = `<span class="transcript-placeholder" id="transcriptPlaceholder">${STEPS[currentStep].placeholder}</span>`;
+        display.classList.remove('has-value', 'listening');
+      }
+    }
+
+    function renderPills() {
+      const container = document.getElementById('collectedPills');
+      container.innerHTML = '';
+      answers.forEach((val, i) => {
+        if (val && i < currentStep) {
+          const pill = document.createElement('div');
+          pill.className = 'collected-pill';
+          pill.innerHTML = `<span class="pill-label">${STEPS[i].pillLabel}</span> ${STEPS[i].pill} ${val}`;
+          container.appendChild(pill);
+        }
+      });
+    }
+
+    function enableNext(enabled) {
+      const btn = document.getElementById('nextBtn');
+      btn.classList.toggle('enabled', enabled);
+    }
+
+    // ─── Navigation ───────────────────────────────────────────────────
+    function nextStep() {
+      // Save current answer
+      const textVal = document.getElementById('textInput').value.trim();
+      const displayVal = document.getElementById('transcriptDisplay').textContent.trim();
+      answers[currentStep] = textVal || (displayVal !== STEPS[currentStep].placeholder ? displayVal : '');
+
+      if (currentStep < STEPS.length - 1) {
+        currentStep++;
+        renderStep(currentStep);
+      } else {
+        // All done — trigger story
+        finishIngredients();
+      }
+    }
+
+    function finishIngredients() {
+      // Hide pipeline, show generate button, auto-click it
+      document.getElementById('pipelineSection').style.display = 'none';
+      const btn = document.getElementById('generateBtn');
+      btn.style.display = 'block';
+      btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => generateStory(), 400);
+    }
+
+    // ─── Voice Input (fully offline via Whisper) ──────────────────────
+
+    async function startVoiceStep(btn) {
+      // Toggle off if already recording
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        stopRecording();
+        return;
+      }
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (e) {
+        setStatus('Microphone access denied — please allow mic access in Chrome.', 'error');
+        return;
+      }
+
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+      // Show listening state
+      const display = document.getElementById('transcriptDisplay');
+      display.innerHTML = '<span class="transcript-placeholder">Listening... 🎤</span>';
+      display.classList.add('listening');
+      display.classList.remove('has-value');
+      document.getElementById('micBtn').classList.add('recording');
+      document.getElementById('micBtnText').textContent = 'Tap to Stop';
+      document.getElementById('textMicBtn').classList.add('recording');
+      setStatus('');
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        // Stop all mic tracks
+        stream.getTracks().forEach(t => t.stop());
+
+        display.innerHTML = '<span class="transcript-placeholder">Transcribing... ⏳</span>';
+        display.classList.add('listening');
+
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const arrayBuffer = await blob.arrayBuffer();
+
+        try {
+          const resp = await fetch('/api/transcribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'audio/webm' },
+            body: arrayBuffer
+          });
+          const data = await resp.json();
+
+          if (data.error) throw new Error(data.error);
+
+          const transcript = data.transcript.trim();
+          if (transcript) {
+            document.getElementById('textInput').value = transcript;
+            updateTranscriptDisplay(transcript);
+            enableNext(true);
+            document.getElementById('speechBubble').textContent = `Got it! "${transcript}" 👍`;
+          } else {
+            updateTranscriptDisplay('');
+            setStatus("Couldn't catch that — try again!", 'error');
+          }
+        } catch (err) {
+          updateTranscriptDisplay(document.getElementById('textInput').value.trim());
+          setStatus('Transcription error: ' + err.message, 'error');
+        }
+
+        // Reset mic button state
+        document.getElementById('micBtn').classList.remove('recording');
+        document.getElementById('micBtnText').textContent = 'Speak Answer';
+        document.getElementById('textMicBtn').classList.remove('recording');
+        document.getElementById('textMicBtn').textContent = '🎤';
+        display.classList.remove('listening');
+        mediaRecorder = null;
+      };
+
+      mediaRecorder.start();
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+      document.getElementById('micBtn').classList.remove('recording');
+      document.getElementById('micBtnText').textContent = 'Speak Answer';
+      document.getElementById('textMicBtn').classList.remove('recording');
+      document.getElementById('textMicBtn').textContent = '🎤';
+      document.getElementById('transcriptDisplay').classList.remove('listening');
+    }
+
+    // ─── Story Generation ─────────────────────────────────────────────
+    async function generateStory() {
+      const [v1, v2, v3, v4] = answers;
+
+      if (!v1 || !v2 || !v3) {
+        setStatus('Missing ingredients — please go back and fill in at least 3! 🦬', 'error');
+        return;
+      }
+
+      storyReady = false;
+      document.getElementById('storySection').classList.remove('visible');
+      document.getElementById('generateBtn').disabled = true;
+      document.getElementById('bisonWrapper').classList.add('thinking');
+
+      const bubbles = [
+        "Hmm, let me think... 🤔",
+        "Oh this is going to be GOOD... ✨",
+        "Galloping through my imagination... 🦬",
+        "Almost there, hold on tight! 📖"
+      ];
+      let bubbleIdx = 0;
+      const bubbleTimer = setInterval(() => {
+        document.getElementById('speechBubble').textContent = bubbles[bubbleIdx % bubbles.length];
+        bubbleIdx++;
+      }, 2000);
+
+      setStatus('Bruno is cooking up your story...');
+
+      const ingredients = [
+        `Main character: ${v1}`,
+        `Setting: ${v2}`,
+        `Problem/challenge: ${v3}`,
+        v4 ? `Magical element: ${v4}` : null
+      ].filter(Boolean).join('\n');
+
+      try {
+        const response = await fetch('/api/story', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ingredients })
+        });
+
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        const data = await response.json();
+
+        clearInterval(bubbleTimer);
+        document.getElementById('bisonWrapper').classList.remove('thinking');
+        document.getElementById('speechBubble').textContent = "Ta-da! Your story is ready! Press Play! 🎉";
+        document.getElementById('storyText').textContent = data.story;
+        document.getElementById('storySection').classList.add('visible');
+        document.getElementById('generateBtn').disabled = false;
+        setStatus('');
+        storyReady = true;
+        document.getElementById('storySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        clearInterval(bubbleTimer);
+        document.getElementById('bisonWrapper').classList.remove('thinking');
+        document.getElementById('speechBubble').textContent = "Uh oh, something went wrong! 😅";
+        setStatus('Error: ' + err.message + ' — Is the backend running?', 'error');
+        document.getElementById('generateBtn').disabled = false;
+      }
+    }
+
+    // ─── TTS Playback ──────────────────────────────────────────────────
+    function togglePlay() {
+      if (isPlaying) {
+        window.speechSynthesis.cancel();
+        setPlayState(false);
+      } else {
+        playStory();
+      }
+    }
+
+    function playStory() {
+      const text = document.getElementById('storyText').textContent;
+      if (!text) return;
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1.05;
+      utterance.volume = 1;
+
+      const selectedName = document.getElementById('voiceSelect').value;
+      const voices = window.speechSynthesis.getVoices();
+      const chosen = voices.find(v => v.name === selectedName) || voices.find(v => v.lang === 'en-US');
+      if (chosen) utterance.voice = chosen;
+
+      utterance.onstart = () => {
+        setPlayState(true);
+        document.getElementById('bisonWrapper').classList.add('thinking');
+        document.getElementById('speechBubble').textContent = "Listen up, here's your story! 🎙️";
+      };
+
+      utterance.onend = () => {
+        setPlayState(false);
+        document.getElementById('bisonWrapper').classList.remove('thinking');
+        document.getElementById('speechBubble').textContent = "Hope you liked it! 🦬⭐";
+      };
+
+      utterance.onerror = () => setPlayState(false);
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function setPlayState(playing) {
+      isPlaying = playing;
+      const btn = document.getElementById('playBtn');
+      btn.classList.toggle('playing', playing);
+      btn.querySelector('.play-icon').textContent = playing ? '⏹️' : '▶️';
+      document.getElementById('playBtnText').textContent = playing ? 'Stop Story' : 'Play Story Aloud';
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────────────
+    function setStatus(msg, type = '') {
+      const el = document.getElementById('statusBar');
+      el.textContent = msg;
+      el.className = 'status-bar' + (type ? ' ' + type : '');
+    }
+
+    // ─── Voice Picker ─────────────────────────────────────────────────
+    function populateVoices() {
+      const voices = window.speechSynthesis.getVoices();
+      const select = document.getElementById('voiceSelect');
+      const englishVoices = voices.filter(v => v.lang.startsWith('en'));
+      const preferred = ['Shelley (English (United States))', 'Daniel (en-GB)',
+                         'Eddy (English (United States))', 'Flo (English (United States))',
+                         'Samantha', 'Karen', 'Moira'];
+      const sorted = [
+        ...preferred.map(name => englishVoices.find(v => v.name === name)).filter(Boolean),
+        ...englishVoices.filter(v => !preferred.includes(v.name)).sort((a,b) => a.name.localeCompare(b.name))
+      ];
+      select.innerHTML = '';
+      sorted.forEach((v, i) => {
+        const opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = v.name.replace(' (English (United States))', '').replace(' (English (United Kingdom))', ' (UK)');
+        if (i === 0) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+    populateVoices();
+  </script>
+</body>
+</html>
